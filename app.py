@@ -159,6 +159,24 @@ with st.sidebar:
         st.success("✅ API Key loaded & ready")
     else:
         st.error("❌ No API Key found")
+        
+        # Input form to add API key
+        with st.form("api_key_form"):
+            api_key = st.text_input("Enter Gemini API Key:", type="password")
+            submitted = st.form_submit_button("💾 Add Key")
+            
+            if submitted and api_key:
+                # Set in session state and environment
+                os.environ["GOOGLE_API_KEY"] = api_key
+                st.session_state["GEMINI_API_KEY"] = api_key
+                
+                # Initialize model
+                try:
+                    st.session_state["model"] = _init_model(api_key)
+                    st.success("✅ API Key added successfully!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Invalid API Key: {str(e)}")
 
 # ================== SHOW CHAT ==================
 for chat in st.session_state.chat_history:
