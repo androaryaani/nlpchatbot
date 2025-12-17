@@ -11,17 +11,26 @@ st.set_page_config(
     layout="centered"
 )
 
-# ================== API KEY ==================
+# ================== API KEY & MODEL HANDLING ==================
+# Load key from env or Streamlit secrets
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 
-if not GEMINI_API_KEY:
-    st.error("❌ Gemini API key not found")
-    st.stop()
+# Keep the key and model in session state so UI can load even if key is missing
+if "GEMINI_API_KEY" not in st.session_state:
+    st.session_state["GEMINI_API_KEY"] = GEMINI_API_KEY
 
-genai.configure(api_key=GEMINI_API_KEY)
+def _init_model(key):
+    genai.configure(api_key=key)
+    return genai.GenerativeModel("models/gemini-2.5-flash")
 
-# ================== MODEL INITIALIZATION ==================
-model = genai.GenerativeModel("models/gemini-2.5-flash")
+if st.session_state.get("GEMINI_API_KEY"):
+    try:
+        st.session_state["model"] = _init_model(st.session_state["GEMINI_API_KEY"])
+    except Exception:
+        st.session_state["model"] = None
+else:
+    st.warning("❌ Gemini API key not found — enter the key in Sidebar to continue")
+    st.session_state["model"] = None
 
 # ================== SYSTEM PROMPT ==================
 SYSTEM_PROMPT = """
@@ -151,12 +160,19 @@ with st.sidebar:
                 secrets_path = ".streamlit/secrets.toml"
                 with open(secrets_path, "w") as f:
                     f.write(f'GOOGLE_API_KEY = "{new_api_key}"\n')
-                
+
                 # Also update environment variable
                 os.environ["GOOGLE_API_KEY"] = new_api_key
-                
+
+                # Update session state and initialize model immediately
+                st.session_state["GEMINI_API_KEY"] = new_api_key
+                try:
+                    st.session_state["model"] = _init_model(new_api_key)
+                except Exception as e:
+                    st.session_state["model"] = None
+                    st.error(f"❌ Error initializing model: {str(e)}")
+
                 st.success("✅ API Key updated successfully!")
-                st.info("ℹ️ Please refresh the page to apply changes")
             except Exception as e:
                 st.error(f"❌ Error updating API Key: {str(e)}")
         else:
@@ -217,14 +233,17 @@ IMPORTANT:
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                response = model.generate_content(
-                    conversation,
-                    generation_config={
-                        "temperature": 0.3,
-                        "max_output_tokens": 800
-                    }
-                )
-                assistant_reply = response.text.strip()
+                if not st.session_state.get("model"):
+                    assistant_reply = "❌ No Gemini API key configured. Please enter it in the Sidebar and update to use the assistant."
+                else:
+                    response = st.session_state["model"].generate_content(
+                        conversation,
+                        generation_config={
+                            "temperature": 0.3,
+                            "max_output_tokens": 800
+                        }
+                    )
+                    assistant_reply = response.text.strip()
             except Exception as e:
                 assistant_reply = f"Error: {str(e)}"
 
