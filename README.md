@@ -340,6 +340,45 @@ If you encounter issues:
 
 ---
 
+## 🌐 Deployment Guide
+
+### Local Development
+1. Copy `.env.example` to `.env`
+2. Add your Gemini API key to `.env`
+3. Run `streamlit run app.py`
+
+### Production Deployment (Heroku, Railway, Render, etc.)
+
+**Step 1: Remove `.env` from repo (keep `.env.example` only)**
+```bash
+git rm --cached .env
+git commit -m "chore: remove .env from repository"
+git push
+```
+
+**Step 2: Set Environment Variable on Your Platform**
+
+**Heroku:**
+```bash
+heroku config:set GOOGLE_API_KEY="your-api-key-here"
+```
+
+**Railway / Render / AWS:**
+- Go to Platform Dashboard → Settings → Environment Variables
+- Add: `GOOGLE_API_KEY=your-api-key-here`
+
+**Streamlit Cloud:**
+1. Go to [share.streamlit.io](https://share.streamlit.io)
+2. Deploy your repo
+3. Go to App Settings → Secrets
+4. Add: `GOOGLE_API_KEY = "your-api-key-here"`
+
+**Step 3: Update API Key (When It Expires)**
+- Re-run the platform command or update via dashboard
+- App will automatically use the new key on next restart
+
+---
+
 ## 🚀 Next Steps & Enhancements
 
 Potential improvements:
