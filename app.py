@@ -155,26 +155,33 @@ with st.sidebar:
     
     if st.button("💾 Update API Key", key="update_api_key"):
         if new_api_key:
+            # Always set the key for the current session and env so the UI can use it immediately
+            os.environ["GOOGLE_API_KEY"] = new_api_key
+            st.session_state["GEMINI_API_KEY"] = new_api_key
+
+            # Try to initialize the model right away
             try:
-                # Update secrets.toml file
+                st.session_state["model"] = _init_model(new_api_key)
+            except Exception as e:
+                st.session_state["model"] = None
+                st.error(f"❌ Error initializing model: {str(e)}")
+
+            # Attempt to persist the key to .streamlit/secrets.toml, but handle read-only filesystems
+            try:
+                secrets_dir = os.path.dirname(".streamlit/secrets.toml") or ".streamlit"
+                os.makedirs(secrets_dir, exist_ok=True)
                 secrets_path = ".streamlit/secrets.toml"
                 with open(secrets_path, "w") as f:
                     f.write(f'GOOGLE_API_KEY = "{new_api_key}"\n')
-
-                # Also update environment variable
-                os.environ["GOOGLE_API_KEY"] = new_api_key
-
-                # Update session state and initialize model immediately
-                st.session_state["GEMINI_API_KEY"] = new_api_key
-                try:
-                    st.session_state["model"] = _init_model(new_api_key)
-                except Exception as e:
-                    st.session_state["model"] = None
-                    st.error(f"❌ Error initializing model: {str(e)}")
-
-                st.success("✅ API Key updated successfully!")
+                st.success("✅ API Key updated and saved to .streamlit/secrets.toml")
             except Exception as e:
-                st.error(f"❌ Error updating API Key: {str(e)}")
+                # If filesystem is read-only, inform the user but keep key for this session
+                msg = str(e)
+                if hasattr(e, 'errno') and e.errno == 30 or 'Read-only file system' in msg:
+                    st.warning("⚠️ Could not save key to .streamlit/secrets.toml (read-only filesystem). Key is available for this session only.")
+                    st.info("To persist the key, create a file named .streamlit/secrets.toml with: GOOGLE_API_KEY = \"<your-key>\"")
+                else:
+                    st.error(f"❌ Error saving API Key: {str(e)}")
         else:
             st.warning("⚠️ Please enter a valid API key")
 
