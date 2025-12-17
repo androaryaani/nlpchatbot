@@ -175,13 +175,14 @@ with st.sidebar:
                     f.write(f'GOOGLE_API_KEY = "{new_api_key}"\n')
                 st.success("✅ API Key updated and saved to .streamlit/secrets.toml")
             except Exception as e:
-                # If filesystem is read-only, inform the user but keep key for this session
-                msg = str(e)
-                if hasattr(e, 'errno') and e.errno == 30 or 'Read-only file system' in msg:
+                # Detect read-only / permission errors robustly and show a friendly message
+                err_text = str(e).lower()
+                is_readonly = isinstance(e, PermissionError) or 'read-only' in err_text or 'read only' in err_text or 'errno 30' in err_text
+                if is_readonly:
                     st.warning("⚠️ Could not save key to .streamlit/secrets.toml (read-only filesystem). Key is available for this session only.")
                     st.info("To persist the key, create a file named .streamlit/secrets.toml with: GOOGLE_API_KEY = \"<your-key>\"")
                 else:
-                    st.error(f"❌ Error saving API Key: {str(e)}")
+                    st.error("❌ Could not save API key to disk. Key is available for this session only.")
         else:
             st.warning("⚠️ Please enter a valid API key")
 
