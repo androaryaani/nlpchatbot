@@ -1,10 +1,10 @@
-# 🤖 Gemini GPT Persona Assistant
+# Gemini GPT Persona Assistant
 
 An intelligent chatbot powered by Google Gemini API with advanced NLP capabilities. This Streamlit application provides a conversational AI assistant with sentiment analysis, intent detection, and multi-language support (English & Hinglish).
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -18,7 +18,7 @@ An intelligent chatbot powered by Google Gemini API with advanced NLP capabiliti
 
 ---
 
-## ✨ Features
+## Features
 
 ### Core Features
 - **Conversational AI** - Powered by Google Gemini 2.5 Flash model
@@ -27,24 +27,24 @@ An intelligent chatbot powered by Google Gemini API with advanced NLP capabiliti
 - **Real-time Processing** - Instant AI responses
 
 ### NLP Features
-1. **Intent Detection** 🎯
+1. **Intent Detection**
    - Identifies user intent (greeting, help, coding, questions, etc.)
    
-2. **Sentiment Analysis** 😊
+2. **Sentiment Analysis** 
    - Detects emotional tone (positive, negative, neutral, unclear)
    
-3. **Keyword Extraction** 📍
+3. **Keyword Extraction**
    - Extracts main keywords from user query
    
-4. **Category Detection** 📂
+4. **Category Detection** 
    - Classifies conversation category (Tech, AI/ML, Learning, Creative, General)
    
-5. **NLP Analytics Dashboard** 📊
+5. **NLP Analytics Dashboard** 
    - Expandable panel showing all NLP insights
 
 ---
 
-## 📦 Prerequisites
+## Prerequisites
 
 - **Python 3.8 or higher**
 - **pip** (Python package manager)
@@ -136,7 +136,7 @@ python app.py
 1. **Start the app** using `streamlit run app.py`
 2. **Enter your query** in the text input field
 3. **Read the response** from the AI assistant
-4. **View NLP insights** by clicking "📊 NLP Analysis" dropdown
+4. **View NLP insights** by clicking "NLP Analysis" dropdown
 
 ### Examples
 
@@ -162,7 +162,7 @@ python app.py
 ```
 
 ### NLP Analysis Panel
-Click the **"📊 NLP Analysis"** dropdown to see:
+Click the **"NLP Analysis"** dropdown to see:
 - **Sentiment:** Emotional tone of your message
 - **Category:** Type of conversation (Tech, AI, Learning, etc.)
 - **Intent:** What you're trying to do
@@ -170,7 +170,7 @@ Click the **"📊 NLP Analysis"** dropdown to see:
 
 ---
 
-## 🧠 NLP Features Explained
+## NLP Features Explained
 
 ### 1. Intent Detection
 Analyzes your message to identify your primary intent:
@@ -185,10 +185,10 @@ Analyzes your message to identify your primary intent:
 ### 2. Sentiment Analysis
 Detects emotional sentiment in your message:
 ```
-😊 Positive   - Contains good, great, love, awesome
-😞 Negative   - Contains bad, hate, terrible, error
-😐 Neutral    - Contains ok, fine, normal
-❓ Unclear    - No clear sentiment detected
+ Positive   - Contains good, great, love, awesome
+ Negative   - Contains bad, hate, terrible, error
+ Neutral    - Contains ok, fine, normal
+ Unclear    - No clear sentiment detected
 ```
 
 ### 3. Keyword Extraction
@@ -200,12 +200,11 @@ Extracts up to 5 most important keywords:
 ### 4. Category Detection
 Classifies conversation into categories:
 ```
-💻 Tech & Coding       - Programming, API, Database
-🧠 AI & ML             - Machine Learning, Neural Networks
-📚 Learning            - Tutorial, Course, Explain
-🎨 Creative            - Design, Art, Story
-⚙️ General             - General queries
-```
+ Tech & Coding       - Programming, API, Database
+ AI & ML             - Machine Learning, Neural Networks
+ Learning            - Tutorial, Course, Explain
+ Creative            - Design, Art, Story
+ General             - General queries```
 
 ---
 

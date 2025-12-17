@@ -3,6 +3,10 @@ import google.generativeai as genai
 import os
 import re
 from collections import Counter
+from dotenv import load_dotenv
+
+# Load .env file if it exists
+load_dotenv()
 
 # ================== PAGE CONFIG ==================
 st.set_page_config(
@@ -12,7 +16,7 @@ st.set_page_config(
 )
 
 # ================== API KEY & MODEL HANDLING ==================
-# Load key from env or Streamlit secrets
+# Load key from: Windows env var → .env file → .streamlit/secrets.toml
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 
 # Keep the key and model in session state so UI can load even if key is missing
@@ -149,42 +153,12 @@ with st.sidebar:
     
     st.divider()
     
-    # Update API Key
-    st.subheader("🔑 API Key Settings")
-    new_api_key = st.text_input("Enter new Gemini API Key:", type="password", key="api_key_input")
-    
-    if st.button("💾 Update API Key", key="update_api_key"):
-        if new_api_key:
-            # Always set the key for the current session and env so the UI can use it immediately
-            os.environ["GOOGLE_API_KEY"] = new_api_key
-            st.session_state["GEMINI_API_KEY"] = new_api_key
-
-            # Try to initialize the model right away
-            try:
-                st.session_state["model"] = _init_model(new_api_key)
-            except Exception as e:
-                st.session_state["model"] = None
-                st.error(f"❌ Error initializing model: {str(e)}")
-
-            # Attempt to persist the key to .streamlit/secrets.toml, but handle read-only filesystems
-            try:
-                secrets_dir = os.path.dirname(".streamlit/secrets.toml") or ".streamlit"
-                os.makedirs(secrets_dir, exist_ok=True)
-                secrets_path = ".streamlit/secrets.toml"
-                with open(secrets_path, "w") as f:
-                    f.write(f'GOOGLE_API_KEY = "{new_api_key}"\n')
-                st.success("✅ API Key updated and saved to .streamlit/secrets.toml")
-            except Exception as e:
-                # Detect read-only / permission errors robustly and show a friendly message
-                err_text = str(e).lower()
-                is_readonly = isinstance(e, PermissionError) or 'read-only' in err_text or 'read only' in err_text or 'errno 30' in err_text
-                if is_readonly:
-                    st.warning("⚠️ Could not save key to .streamlit/secrets.toml (read-only filesystem). Key is available for this session only.")
-                    st.info("To persist the key, create a file named .streamlit/secrets.toml with: GOOGLE_API_KEY = \"<your-key>\"")
-                else:
-                    st.error("❌ Could not save API key to disk. Key is available for this session only.")
-        else:
-            st.warning("⚠️ Please enter a valid API key")
+    # Show API Key Status
+    st.subheader("🔑 API Key Status")
+    if st.session_state.get("GEMINI_API_KEY"):
+        st.success("✅ API Key loaded & ready")
+    else:
+        st.error("❌ No API Key found")
 
 # ================== SHOW CHAT ==================
 for chat in st.session_state.chat_history:
